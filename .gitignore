@@ -5,6 +5,9 @@
 !.gitignore
 
 !*.c
+!*.h
+
 !2-Ethernet/
+!Util/
 
 
