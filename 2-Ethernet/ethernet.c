@@ -29,8 +29,6 @@ Ethernet frame:
 #include <arpa/inet.h>
 #include <linux/if_ether.h>
 
-
-#define BYTE_SIZE 8
 #define ADDR_BYTES 6
 #define TYPE_BYTES 2
 
@@ -53,8 +51,13 @@ typedef struct {
 // logging
 void log_frame_header(FILE *log_fd, ethernet_frame *frame){
     fprintf(log_fd, "\n[Ethernet] - Size: %d\n", frame->payload_size + HEADER_BYTES);
-    LOG_VALUE(log_fd, frame->addr_destination);
-    LOG_VALUE(log_fd, frame->addr_source);
+
+    char *buf = alloca(ADDR_SPACE_STR * 2);
+    format_mac_address(frame->addr_destination, buf);
+    format_mac_address(frame->addr_source, buf + ADDR_SPACE_STR);
+
+    LOG_STR_VALUE(log_fd, frame->addr_destination, buf);
+    LOG_STR_VALUE(log_fd, frame->addr_source, buf + ADDR_SPACE_STR);
     LOG_VALUE(log_fd, frame->ether_type);
 }
 
@@ -81,9 +84,9 @@ void save_frame(unsigned char *buff, ethernet_frame *frame, int size){
     // copy only the payload/data
     memcpy(&frame->data, buff + HEADER_BYTES, size - HEADER_BYTES);
 
-    frame->addr_destination = *(unsigned long int*)buff;
-    frame->addr_source = *(unsigned long int*)(buff + ADDR_BYTES);
-    frame->ether_type = *(unsigned short*)(buff + ADDR_BYTES + ADDR_BYTES);
+    frame->addr_destination = convert_address_bit_numbering(*(unsigned long int*)buff);
+    frame->addr_source = convert_address_bit_numbering(*(unsigned long int*)(buff + ADDR_BYTES));
+    frame->ether_type = convert_address_bit_numbering(*(unsigned short*)(buff + ADDR_BYTES + ADDR_BYTES)) >> BYTE_SIZE * (ADDR_BYTES - sizeof(short int));
     frame->payload_size = size - HEADER_BYTES;
 }
 

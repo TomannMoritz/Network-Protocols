@@ -7,6 +7,5 @@ int main(void){
     FILE *log_fd = stdout;
     start(socket_fd, log_fd);
 
-
     return 0;
 }
