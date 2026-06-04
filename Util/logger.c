@@ -6,7 +6,7 @@
 #define SPACE_CHAR ' '
 
 
-void log_byte_data(FILE *log_fd, void *data, int data_size, int line_size){
+void log_byte_data(FILE *log_fd, unsigned char *data, int data_size, int line_size){
     unsigned char *p = data;
     char hex_buff[line_size * 4] = {};
     char char_buff[line_size * 2] = {};

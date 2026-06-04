@@ -41,12 +41,10 @@ Ethernet frame:
 #define MAX_MTU_BYTES (1 << 16)
 
 
-// TODO: parse CRC
 typedef struct {
     unsigned long int addr_destination: ADDR_BYTES * BYTE_SIZE;
     unsigned long int addr_source: ADDR_BYTES * BYTE_SIZE;
     unsigned short ether_type: TYPE_BYTES * BYTE_SIZE;
-    int crc: CRC_BYTES;
     unsigned char data[MAX_MTU_BYTES];
     int payload_size;
 } ethernet_frame;
@@ -113,14 +111,4 @@ void start(int socket_fd, FILE *log_fd){
         log_frame_header(log_fd, &frame);
         log_frame_data(log_fd, &frame, line_size);
     }
-}
-
-
-int main(void){
-    int socket_fd = setup();
-
-    FILE *log_fd = stdout;
-    start(socket_fd, log_fd);
-
-    return 0;
 }
