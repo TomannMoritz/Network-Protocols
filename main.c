@@ -1,4 +1,5 @@
 #include "2-Ethernet/ethernet.h"
+#include "2-Ethernet/ethernet.c"
 
 
 int main(void){

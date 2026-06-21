@@ -3,5 +3,5 @@ Network Protocols
 
 ## Compilation
 ```bash
-gcc -o main Util/logger.c 2-Ethernet/ethernet.c main.c
+gcc -o main main.c
 ```

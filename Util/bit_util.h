@@ -5,15 +5,6 @@
 #define BYTE_SIZE 8
 #define BYTE_MASK 0xFF
 
-#define BIT_MASK_01 0b1
-#define BIT_MASK_02 0b11
-#define BIT_MASK_03 0b111
-#define BIT_MASK_04 0xF
-#define BIT_MASK_05 0b11111
-#define BIT_MASK_06 0b111111
-#define BIT_MASK_07 0b1111111
-#define BIT_MASK_08 0xFF
-
 
 typedef struct {
     unsigned char *data;

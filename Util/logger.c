@@ -1,4 +1,7 @@
+// Logger
 #include "logger.h"
+
+#include "bit_util.c"
 
 #define HEX_FORMAT "%02X"
 #define HEX_SPACE " "
@@ -14,14 +17,10 @@
 
 
 unsigned long int convert_address_bit_numbering(unsigned long int address){
-    unsigned long int new_addr = 0 +
-        ((unsigned long int)((address >> BYTE_SIZE* 0) & BYTE_MASK) << BYTE_SIZE* 5) +
-        ((unsigned long int)((address >> BYTE_SIZE* 1) & BYTE_MASK) << BYTE_SIZE* 4) +
-        ((unsigned long int)((address >> BYTE_SIZE* 2) & BYTE_MASK) << BYTE_SIZE* 3) +
-        ((unsigned long int)((address >> BYTE_SIZE* 3) & BYTE_MASK) << BYTE_SIZE* 2) +
-        ((unsigned long int)((address >> BYTE_SIZE* 4) & BYTE_MASK) << BYTE_SIZE* 1) +
-        ((unsigned long int)((address >> BYTE_SIZE* 5) & BYTE_MASK) << BYTE_SIZE* 0);
+    unsigned long int new_addr = convert_64_bit_numbering(address);
 
+    // Clear additional two bytes
+    new_addr = new_addr >> (BYTE_SIZE * 2);
     return new_addr;
 }
 
@@ -66,3 +65,4 @@ void log_byte_data(FILE *log_fd, unsigned char *data, int data_size, int line_si
     fprintf(log_fd, DATA_FORMAT, hex_buff, space, char_buff);
     fprintf(log_fd, "\n");
 }
+

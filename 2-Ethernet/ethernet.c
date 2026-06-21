@@ -18,7 +18,8 @@ Ethernet frame:
 */
 
 
-#include "../Util/logger.h"
+#include "ethernet.h"
+#include "../Util/logger.c"
 
 
 #include <stdio.h>
