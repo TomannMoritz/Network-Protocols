@@ -46,6 +46,7 @@ typedef struct {
     unsigned short ether_type: TYPE_BYTES * BYTE_SIZE;
     unsigned char data[MAX_MTU_BYTES];
     int payload_size;
+    time_t time;
 } ethernet_frame;
 
 
@@ -60,6 +61,9 @@ void log_frame_header(FILE *log_fd, ethernet_frame *frame){
     LOG_STR_VALUE(log_fd, frame->addr_destination, buf);
     LOG_STR_VALUE(log_fd, frame->addr_source, buf + ADDR_SPACE_STR);
     LOG_VALUE(log_fd, frame->ether_type);
+
+    struct tm *t = localtime(&frame->time);
+    log_time(log_fd, t);
 }
 
 
@@ -89,6 +93,10 @@ void save_frame(unsigned char *buff, ethernet_frame *frame, int size){
     frame->addr_source = convert_address_bit_numbering(*(unsigned long int*)(buff + ADDR_BYTES));
     frame->ether_type = convert_address_bit_numbering(*(unsigned short*)(buff + ADDR_BYTES + ADDR_BYTES)) >> BYTE_SIZE * (ADDR_BYTES - sizeof(short int));
     frame->payload_size = size - HEADER_BYTES;
+
+    time_t raw_time;
+    time(&raw_time);
+    frame->time = raw_time;
 }
 
 

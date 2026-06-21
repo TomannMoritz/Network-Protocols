@@ -66,3 +66,8 @@ void log_byte_data(FILE *log_fd, unsigned char *data, int data_size, int line_si
     fprintf(log_fd, "\n");
 }
 
+
+void log_time(FILE *log_fd, struct tm *t){
+    fprintf(log_fd, "\tTime = %02d:%02d:%02d\n", t->tm_hour, t->tm_min, t->tm_sec);
+}
+

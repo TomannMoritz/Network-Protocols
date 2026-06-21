@@ -2,6 +2,7 @@
 #pragma once
 #include <stdio.h>
 #include <ctype.h>
+#include <time.h>
 
 #include "bit_util.h"
 
@@ -19,4 +20,5 @@
 unsigned long int convert_address_bit_numbering(unsigned long int address);
 void format_mac_address(unsigned long int address, char *buf);
 void log_byte_data(FILE *log_fd, unsigned char *data, int data_size, int line_size);
+void log_time(FILE *log_fd, struct tm *t);
 
