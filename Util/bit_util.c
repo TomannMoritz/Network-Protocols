@@ -1,6 +1,8 @@
 // bit util
 #include "bit_util.h"
 
+#include "test_util.c"
+
 
 #define ASCII_0 ('0')
 #define ASCII_1 ('1')
@@ -18,18 +20,23 @@
 
 
 //--------------------------------------------------
-void print_bits(FILE *log_fd, unsigned char *buffer, int num_bytes){
-    fprintf(log_fd, "\n\nData:\n");
-    for (int i = 0; i < num_bytes; i++){
-        fprintf(log_fd, BYTE_BIT_PATTERN " ", BYTE_BITS(buffer[i]));
-    }
+void log_data(FILE *log_fd, u8 *buffer, u32 num_bytes){
+    fprintf(log_fd, "\n\nData:\n0b");
+    log_bits(log_fd, buffer, num_bytes);
     fprintf(log_fd, "\n\n");
 }
 
 
+void log_bits(FILE *log_fd, u8 *buffer, u32 num_bytes){
+    for (int i = 0; i < num_bytes; i++){
+        fprintf(log_fd, BYTE_BIT_PATTERN " ", BYTE_BITS(buffer[i]));
+    }
+}
+
+
 //--------------------------------------------------
-u32 convert_32_bit_numbering(unsigned int value){
-    unsigned int new_value = 0
+u32 convert_32_bit_numbering(u32 value){
+    u32 new_value = 0
         | (((value >> BYTE_SIZE * 0) & BYTE_MASK) << BYTE_SIZE * 3)
         | (((value >> BYTE_SIZE * 1) & BYTE_MASK) << BYTE_SIZE * 2)
         | (((value >> BYTE_SIZE * 2) & BYTE_MASK) << BYTE_SIZE * 1)
@@ -39,8 +46,8 @@ u32 convert_32_bit_numbering(unsigned int value){
 }
 
 
-u64 convert_64_bit_numbering(unsigned long int value){
-    unsigned long int new_value = 0
+u64 convert_64_bit_numbering(u64 value){
+    u64 new_value = 0
         | (((value >> BYTE_SIZE * 0) & BYTE_MASK) << BYTE_SIZE * 7)
         | (((value >> BYTE_SIZE * 1) & BYTE_MASK) << BYTE_SIZE * 6)
         | (((value >> BYTE_SIZE * 2) & BYTE_MASK) << BYTE_SIZE * 5)
@@ -55,7 +62,7 @@ u64 convert_64_bit_numbering(unsigned long int value){
 
 
 //--------------------------------------------------
-Optional_u64 create_n_bit_mask(int num_bits){
+Optional_u64 create_n_bit_mask(u32 num_bits){
     Optional_u64 result = {};
 
     int max_bits = sizeof(long int) * BYTE_SIZE;
@@ -65,7 +72,7 @@ Optional_u64 create_n_bit_mask(int num_bits){
     int out_of_bounds = num_bits > max_bits;
     result.error.value |= out_of_bounds;
 
-    unsigned long int mask;
+    u64 mask;
     mask = mask ^ (~mask);
     mask = mask >> diff_bits;
 
@@ -74,9 +81,9 @@ Optional_u64 create_n_bit_mask(int num_bits){
 }
 
 
-Optional_u64 extract_bits(DataOffset *data_offset, int num_bits){
+Optional_u64 extract_bits(DataOffset *data_offset, u32 num_bits){
     Optional_u64 result = {};
-    int overflow_bytes = data_offset->offset_bits / BYTE_SIZE;
+    u32 overflow_bytes = data_offset->offset_bits / BYTE_SIZE;
 
     // Update buffer pointer
     data_offset->data += overflow_bytes;
