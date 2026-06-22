@@ -28,41 +28,54 @@ void print_bits(FILE *log_fd, unsigned char *buffer, int num_bytes){
 
 
 //--------------------------------------------------
-unsigned int convert_32_bit_numbering(unsigned int value){
-    unsigned int new_value = 0 +
-        ((unsigned int)((unsigned int)(value >> BYTE_SIZE* 0) & BYTE_MASK) << BYTE_SIZE* 3) +
-        ((unsigned int)((unsigned int)(value >> BYTE_SIZE* 1) & BYTE_MASK) << BYTE_SIZE* 2) +
-        ((unsigned int)((unsigned int)(value >> BYTE_SIZE* 2) & BYTE_MASK) << BYTE_SIZE* 1) +
-        ((unsigned int)((unsigned int)(value >> BYTE_SIZE* 3) & BYTE_MASK) << BYTE_SIZE* 0);
+u32 convert_32_bit_numbering(unsigned int value){
+    unsigned int new_value = 0
+        | (((value >> BYTE_SIZE * 0) & BYTE_MASK) << BYTE_SIZE * 3)
+        | (((value >> BYTE_SIZE * 1) & BYTE_MASK) << BYTE_SIZE * 2)
+        | (((value >> BYTE_SIZE * 2) & BYTE_MASK) << BYTE_SIZE * 1)
+        | (((value >> BYTE_SIZE * 3) & BYTE_MASK) << BYTE_SIZE * 0);
 
     return new_value;
 }
 
 
-unsigned long int convert_64_bit_numbering(unsigned long int value){
-    unsigned long int new_value = 0 +
-        ((unsigned long int)((unsigned long int)(value >> BYTE_SIZE* 0) & BYTE_MASK) << BYTE_SIZE* 7) +
-        ((unsigned long int)((unsigned long int)(value >> BYTE_SIZE* 1) & BYTE_MASK) << BYTE_SIZE* 6) +
-        ((unsigned long int)((unsigned long int)(value >> BYTE_SIZE* 2) & BYTE_MASK) << BYTE_SIZE* 5) +
-        ((unsigned long int)((unsigned long int)(value >> BYTE_SIZE* 3) & BYTE_MASK) << BYTE_SIZE* 4) +
-        ((unsigned long int)((unsigned long int)(value >> BYTE_SIZE* 4) & BYTE_MASK) << BYTE_SIZE* 3) +
-        ((unsigned long int)((unsigned long int)(value >> BYTE_SIZE* 5) & BYTE_MASK) << BYTE_SIZE* 2) +
-        ((unsigned long int)((unsigned long int)(value >> BYTE_SIZE* 6) & BYTE_MASK) << BYTE_SIZE* 1) +
-        ((unsigned long int)((unsigned long int)(value >> BYTE_SIZE* 7) & BYTE_MASK) << BYTE_SIZE* 0);
+u64 convert_64_bit_numbering(unsigned long int value){
+    unsigned long int new_value = 0
+        | (((value >> BYTE_SIZE * 0) & BYTE_MASK) << BYTE_SIZE * 7)
+        | (((value >> BYTE_SIZE * 1) & BYTE_MASK) << BYTE_SIZE * 6)
+        | (((value >> BYTE_SIZE * 2) & BYTE_MASK) << BYTE_SIZE * 5)
+        | (((value >> BYTE_SIZE * 3) & BYTE_MASK) << BYTE_SIZE * 4)
+        | (((value >> BYTE_SIZE * 4) & BYTE_MASK) << BYTE_SIZE * 3)
+        | (((value >> BYTE_SIZE * 5) & BYTE_MASK) << BYTE_SIZE * 2)
+        | (((value >> BYTE_SIZE * 6) & BYTE_MASK) << BYTE_SIZE * 1)
+        | (((value >> BYTE_SIZE * 7) & BYTE_MASK) << BYTE_SIZE * 0);
 
     return new_value;
 }
 
 
 //--------------------------------------------------
-unsigned long int create_n_bit_mask(int num_bits){
-    unsigned long int mask = 0b1;
-    mask = (mask << num_bits) - 1;
-    return mask;
+Optional_u64 create_n_bit_mask(int num_bits){
+    Optional_u64 result = {};
+
+    int max_bits = sizeof(long int) * BYTE_SIZE;
+    int diff_bits = max_bits - num_bits;
+
+    // NOTE: only mark invalid result
+    int out_of_bounds = num_bits > max_bits;
+    result.error.value |= out_of_bounds;
+
+    unsigned long int mask;
+    mask = mask ^ (~mask);
+    mask = mask >> diff_bits;
+
+    result.value = mask;
+    return result;
 }
 
 
-unsigned long int extract_bits(DataOffset *data_offset, int num_bits){
+Optional_u64 extract_bits(DataOffset *data_offset, int num_bits){
+    Optional_u64 result = {};
     int overflow_bytes = data_offset->offset_bits / BYTE_SIZE;
 
     // Update buffer pointer
@@ -70,10 +83,9 @@ unsigned long int extract_bits(DataOffset *data_offset, int num_bits){
     data_offset->offset_bits -= overflow_bytes * BYTE_SIZE;
 
     // Check bounds: Check if all bits can be copied (valid copy)
-    int out_of_bounds = data_offset->offset_bits + num_bits > sizeof(long int);
-    if (out_of_bounds){
-        return 0;
-    }
+    int out_of_bounds = data_offset->offset_bits + num_bits > sizeof(long int) * BYTE_SIZE;
+    result.error.value |= out_of_bounds;
+    OPTIONAL_ERROR_RETURN(result);
 
     // Copy next bytes
     unsigned long int value = 0
@@ -90,11 +102,15 @@ unsigned long int extract_bits(DataOffset *data_offset, int num_bits){
     value = value >> (64 - num_bits - data_offset->offset_bits);
 
     // Clear offset bits
-    unsigned long int mask = create_n_bit_mask(num_bits);
-    value &= mask;
+    Optional_u64 mask = create_n_bit_mask(num_bits);
+    result.error.value |= mask.error.value;
+    OPTIONAL_ERROR_RETURN(result);
+
+    value &= mask.value;
 
     // Update buffer offset
     data_offset->offset_bits += num_bits;
-    return value;
+    result.value = value;
+    return result;
 }
 
