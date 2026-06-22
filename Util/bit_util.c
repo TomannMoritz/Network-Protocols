@@ -64,12 +64,15 @@ u64 convert_64_bit_numbering(u64 value){
 //--------------------------------------------------
 Optional_u64 create_n_bit_mask(u32 num_bits){
     Optional_u64 result = {};
+    if (num_bits == 0){
+        return result;
+    }
 
-    int max_bits = sizeof(long int) * BYTE_SIZE;
-    int diff_bits = max_bits - num_bits;
+    u32 max_bits = sizeof(u64) * BYTE_SIZE;
+    u32 diff_bits = max_bits - num_bits;
 
     // NOTE: only mark invalid result
-    int out_of_bounds = num_bits > max_bits;
+    u32 out_of_bounds = num_bits > max_bits;
     result.error.value |= out_of_bounds;
 
     u64 mask;
@@ -90,20 +93,20 @@ Optional_u64 extract_bits(DataOffset *data_offset, u32 num_bits){
     data_offset->offset_bits -= overflow_bytes * BYTE_SIZE;
 
     // Check bounds: Check if all bits can be copied (valid copy)
-    int out_of_bounds = data_offset->offset_bits + num_bits > sizeof(long int) * BYTE_SIZE;
+    u32 out_of_bounds = data_offset->offset_bits + num_bits > sizeof(u64) * BYTE_SIZE;
     result.error.value |= out_of_bounds;
     OPTIONAL_ERROR_RETURN(result);
 
     // Copy next bytes
-    unsigned long int value = 0
-        | (unsigned long int)data_offset->data[0] << (BYTE_SIZE * 7)
-        | (unsigned long int)data_offset->data[1] << (BYTE_SIZE * 6)
-        | (unsigned long int)data_offset->data[2] << (BYTE_SIZE * 5)
-        | (unsigned long int)data_offset->data[3] << (BYTE_SIZE * 4)
-        | (unsigned long int)data_offset->data[4] << (BYTE_SIZE * 3)
-        | (unsigned long int)data_offset->data[5] << (BYTE_SIZE * 2)
-        | (unsigned long int)data_offset->data[6] << (BYTE_SIZE * 1)
-        | (unsigned long int)data_offset->data[7] << (BYTE_SIZE * 0);
+    u64 value = 0
+        | (u64)data_offset->data[0] << (BYTE_SIZE * 7)
+        | (u64)data_offset->data[1] << (BYTE_SIZE * 6)
+        | (u64)data_offset->data[2] << (BYTE_SIZE * 5)
+        | (u64)data_offset->data[3] << (BYTE_SIZE * 4)
+        | (u64)data_offset->data[4] << (BYTE_SIZE * 3)
+        | (u64)data_offset->data[5] << (BYTE_SIZE * 2)
+        | (u64)data_offset->data[6] << (BYTE_SIZE * 1)
+        | (u64)data_offset->data[7] << (BYTE_SIZE * 0);
 
     // Clear next bits
     value = value >> (64 - num_bits - data_offset->offset_bits);
@@ -119,5 +122,72 @@ Optional_u64 extract_bits(DataOffset *data_offset, u32 num_bits){
     data_offset->offset_bits += num_bits;
     result.value = value;
     return result;
+}
+
+
+//--------------------------------------------------
+// Testing
+//--------------------------------------------------
+void test_convert_32_bit_numbering(){
+    u32 result = convert_32_bit_numbering(0x0);
+    TEST_ASSERT_EQUAL_u64(0x0, result, HEX);
+
+    result = convert_32_bit_numbering(0xFFFFFFFF);
+    TEST_ASSERT_EQUAL_u64(0xFFFFFFFF, result, HEX);
+
+    result = convert_32_bit_numbering(0x2468ABEF);
+    TEST_ASSERT_EQUAL_u64(0xEFAB6824, result, HEX);
+
+    result = convert_32_bit_numbering(0xABCD);
+    TEST_ASSERT_EQUAL_u64(0xCDAB0000, result, HEX);
+}
+
+
+void test_convert_64_bit_numbering(){
+    u64 result = convert_64_bit_numbering(0x0);
+    TEST_ASSERT_EQUAL_u64(0x0, result, HEX);
+
+    result = convert_64_bit_numbering(0xFFFFFFFFFFFFFFFF);
+    TEST_ASSERT_EQUAL_u64(0xFFFFFFFFFFFFFFFF, result, HEX);
+
+    result = convert_64_bit_numbering(0x123456789ABCDEF);
+    TEST_ASSERT_EQUAL_u64(0xEFCDAB8967452301, result, HEX);
+
+    result = convert_64_bit_numbering(0xABCD);
+    TEST_ASSERT_EQUAL_u64(0xCDAB000000000000, result, HEX);
+}
+
+
+void test_create_n_bit_mask(){
+    Optional_u64 result = create_n_bit_mask(0);
+    TEST_ASSERT_EQUAL_u64(result.error.value, 0, HEX);
+    TEST_ASSERT_EQUAL_u64(result.value, 0, HEX);
+
+    result = create_n_bit_mask(3);
+    TEST_ASSERT_EQUAL_u64(result.error.value, 0, HEX);
+    TEST_ASSERT_EQUAL_u64(result.value, 0b111, HEX);
+
+    result = create_n_bit_mask(64);
+    TEST_ASSERT_EQUAL_u64(result.error.value, 0, HEX);
+    TEST_ASSERT_EQUAL_u64(result.value, 0xFFFFFFFFFFFFFFFF, HEX);
+
+    result = create_n_bit_mask(65);
+    TEST_ASSERT_EQUAL_u64(result.error.value & 0b1, 1, HEX);
+
+    result = create_n_bit_mask(0xFFFFFFFF);
+    TEST_ASSERT_EQUAL_u64(result.error.value & 0b1, 1, HEX);
+}
+
+
+void test_extract_bits(){
+    // TODO:
+}
+
+
+void test_bit_util(){
+    test_convert_32_bit_numbering();
+    test_convert_64_bit_numbering();
+    test_create_n_bit_mask();
+    test_extract_bits();
 }
 

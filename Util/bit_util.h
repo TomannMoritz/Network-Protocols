@@ -23,3 +23,7 @@ u64 convert_64_bit_numbering(u64 value);
 Optional_u64 create_n_bit_mask(u32 num_bits);
 Optional_u64 extract_bits(DataOffset *data_offset, u32 num_bits);
 
+//--------------------------------------------------
+// Testing
+//--------------------------------------------------
+void test_bit_util();
