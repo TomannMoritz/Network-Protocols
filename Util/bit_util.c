@@ -4,6 +4,8 @@
 #include "test_util.c"
 
 
+#define MIN(value_1, value_2) (value_1 < value_2 ? value_1 : value_2)
+
 #define ASCII_0 ('0')
 #define ASCII_1 ('1')
 
@@ -86,14 +88,26 @@ Optional_u64 create_n_bit_mask(u32 num_bits){
 
 Optional_u64 extract_bits(DataOffset *data_offset, u32 num_bits){
     Optional_u64 result = {};
+
+    // Note: only extract new bits with valid offset (no error)
+    result.error.value |= data_offset->error.value;
+    OPTIONAL_ERROR_RETURN(result);
+
     u32 overflow_bytes = data_offset->offset_bits / BYTE_SIZE;
 
     // Update buffer pointer
+    // Note: update length only with data (at byte level)
     data_offset->data += overflow_bytes;
+    data_offset->length -= overflow_bytes * BYTE_SIZE;
     data_offset->offset_bits -= overflow_bytes * BYTE_SIZE;
 
     // Check bounds: Check if all bits can be copied (valid copy)
-    u32 out_of_bounds = data_offset->offset_bits + num_bits > sizeof(u64) * BYTE_SIZE;
+    u32 data_size = data_offset->length;
+    u32 max_size = sizeof(u64) * BYTE_SIZE;
+    data_size = MIN(data_size, max_size);
+
+    u32 out_of_bounds = data_offset->offset_bits + num_bits > data_size;
+    data_offset->error.value |= out_of_bounds;
     result.error.value |= out_of_bounds;
     OPTIONAL_ERROR_RETURN(result);
 
@@ -113,6 +127,7 @@ Optional_u64 extract_bits(DataOffset *data_offset, u32 num_bits){
 
     // Clear offset bits
     Optional_u64 mask = create_n_bit_mask(num_bits);
+    data_offset->error.value |= mask.error.value;
     result.error.value |= mask.error.value;
     OPTIONAL_ERROR_RETURN(result);
 
@@ -172,15 +187,102 @@ void test_create_n_bit_mask(){
     TEST_ASSERT_EQUAL_u64(result.value, 0xFFFFFFFFFFFFFFFF, HEX);
 
     result = create_n_bit_mask(65);
-    TEST_ASSERT_EQUAL_u64(result.error.value & 0b1, 1, HEX);
+    TEST_ASSERT_EQUAL_u64(result.error.value & True, 1, HEX);
 
     result = create_n_bit_mask(0xFFFFFFFF);
-    TEST_ASSERT_EQUAL_u64(result.error.value & 0b1, 1, HEX);
+    TEST_ASSERT_EQUAL_u64(result.error.value & True, 1, HEX);
+}
+
+
+void test_extract_data_valid(){
+    u8 data[] = {0xFF, 0xAB};
+    u32 data_length = 2 * BYTE_SIZE;
+    DataOffset test_offset = {};
+    DataOffset *data_offset = &test_offset;
+    data_offset->data = data;
+    data_offset->length = data_length;
+
+    // Extract no bits
+    Optional_u64 result = extract_bits(data_offset, 0);
+    TEST_ASSERT_EQUAL_u64(0, result.error.value, HEX);
+    TEST_ASSERT_EQUAL_u64(0, result.value, HEX);
+    TEST_ASSERT_EQUAL_u64(0, data_offset->offset_bits, HEX);
+    TEST_ASSERT_EQUAL_u64(data_length, data_offset->length, NUM);
+
+    // Extract one byte (octet)
+    u32 num_bits = 8;
+    result = extract_bits(data_offset, num_bits);
+    TEST_ASSERT_EQUAL_u64(0, result.error.value, HEX);
+    TEST_ASSERT_EQUAL_u64(0xFF, result.value, HEX);
+    TEST_ASSERT_EQUAL_u64(num_bits, data_offset->offset_bits, HEX);
+    TEST_ASSERT_EQUAL_u64(data_length, data_offset->length, NUM);
+    data_length -= 8;
+
+    // Extract one byte in multiple steps (bit size)
+    num_bits = 4;
+    result = extract_bits(data_offset, num_bits);
+    TEST_ASSERT_EQUAL_u64(0, result.error.value, HEX);
+    TEST_ASSERT_EQUAL_u64(0xA, result.value, HEX);
+    TEST_ASSERT_EQUAL_u64(num_bits, data_offset->offset_bits, HEX);
+    TEST_ASSERT_EQUAL_u64(data_length, data_offset->length, NUM);
+
+    num_bits = 3;
+    result = extract_bits(data_offset, num_bits);
+    TEST_ASSERT_EQUAL_u64(0, result.error.value, HEX);
+    TEST_ASSERT_EQUAL_u64(0x5, result.value, HEX);
+    TEST_ASSERT_EQUAL_u64(4 + num_bits, data_offset->offset_bits, HEX);
+    TEST_ASSERT_EQUAL_u64(data_length, data_offset->length, NUM);
+
+    num_bits = 1;
+    result = extract_bits(data_offset, num_bits);
+    TEST_ASSERT_EQUAL_u64(0, result.error.value, HEX);
+    TEST_ASSERT_EQUAL_u64(0x1, result.value, HEX);
+    TEST_ASSERT_EQUAL_u64(4 + 3 + num_bits, data_offset->offset_bits, HEX);
+    TEST_ASSERT_EQUAL_u64(data_length, data_offset->length, NUM);
+    data_length -= 4 + 3 + 1;
+
+    // Extract no bits
+    result = extract_bits(data_offset, 0);
+    TEST_ASSERT_EQUAL_u64(data_length, data_offset->length, NUM);
+}
+
+
+void test_extract_data_invalid_num_bits(){
+    u8 data[] = {0xFF, 0xAB};
+    DataOffset test_offset = {};
+    DataOffset *data_offset = &test_offset;
+    data_offset->data = data;
+    data_offset->length = 2 * BYTE_SIZE;
+
+    // Extract out of bounds
+    u32 num_bits = 65;
+    Optional_u64 result = extract_bits(data_offset, num_bits);
+    TEST_ASSERT_EQUAL_u64(1, result.error.value & True, HEX);
+    TEST_ASSERT_EQUAL_u64(0, result.value, HEX);
+    TEST_ASSERT_EQUAL_u64(0, data_offset->offset_bits, HEX);
+}
+
+
+void test_extract_data_invalid_data(){
+    u8 data[] = {0xFF};
+    DataOffset test_offset = {};
+    DataOffset *data_offset = &test_offset;
+    data_offset->data = data;
+    data_offset->length = 1 * BYTE_SIZE;
+
+    // Extract out of bounds
+    u32 num_bits = 32;
+    Optional_u64 result = extract_bits(data_offset, num_bits);
+    TEST_ASSERT_EQUAL_u64(1, result.error.value & True, HEX);
+    TEST_ASSERT_EQUAL_u64(0, result.value, HEX);
+    TEST_ASSERT_EQUAL_u64(0, data_offset->offset_bits, HEX);
 }
 
 
 void test_extract_bits(){
-    // TODO:
+    test_extract_data_valid();
+    test_extract_data_invalid_num_bits();
+    test_extract_data_invalid_data();
 }
 
 

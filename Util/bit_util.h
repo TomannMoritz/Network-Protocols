@@ -9,8 +9,10 @@
 
 
 typedef struct {
-    unsigned char *data;
-    unsigned char offset_bits;
+    u8 *data;
+    u8 offset_bits;
+    u32 length;
+    Error error;
 } DataOffset;
 
 

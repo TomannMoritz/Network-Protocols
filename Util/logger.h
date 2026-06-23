@@ -9,6 +9,10 @@
 #define LOG_VALUE(fd, x) fprintf(fd, "\t%s = %04lx\n", #x, x)
 #define LOG_STR_VALUE(fd, x, str) fprintf(fd, "\t%s = %s\n", #x, str)
 
+#define LOG_HEX(fd, x) fprintf(fd, "\t%s = %04lx\n", #x, x)
+#define LOG_U64(fd, x) fprintf(fd, "\t%s = %lu\n", #x, x)
+#define LOG_S64(fd, x) fprintf(fd, "\t%s = %li\n", #x, x)
+
 
 // NOTE: A MAC Address requires 6 BYTES as a number
 // Converting to a string requires more memory:
