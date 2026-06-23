@@ -16,6 +16,8 @@ typedef struct {
 } DataOffset;
 
 
+DataOffset create_data_offset(u8 data[], u32 num_ele);
+
 void log_data(FILE *log_fd, u8 *buffer, u32 num_bytes);
 void log_bits(FILE *log_fd, u8 *buffer, u32 num_bytes);
 

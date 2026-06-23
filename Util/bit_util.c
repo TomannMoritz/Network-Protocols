@@ -22,6 +22,18 @@
 
 
 //--------------------------------------------------
+DataOffset create_data_offset(u8 data[], u32 num_ele){
+    DataOffset data_offset;
+    data_offset.data = data;
+    data_offset.length = num_ele * BYTE_SIZE;
+    data_offset.offset_bits = 0;
+    data_offset.error.value = 0;
+
+    return data_offset;
+}
+
+
+//--------------------------------------------------
 void log_data(FILE *log_fd, u8 *buffer, u32 num_bytes){
     fprintf(log_fd, "\n\nData:\n0b");
     log_bits(log_fd, buffer, num_bytes);
@@ -143,6 +155,17 @@ Optional_u64 extract_bits(DataOffset *data_offset, u32 num_bits){
 //--------------------------------------------------
 // Testing
 //--------------------------------------------------
+void test_create_data_offset(){
+    u8 data[] = {0xFF};
+    u32 num_ele = sizeof(data);
+    DataOffset result = create_data_offset(data, num_ele);
+
+    TEST_ASSERT_EQUAL_u64(0xFF, result.data[0], HEX);
+    TEST_ASSERT_EQUAL_u64(num_ele * BYTE_SIZE, result.length, NUM);
+    TEST_ASSERT_EQUAL_u64(0, result.error.value, NUM);
+    TEST_ASSERT_EQUAL_u64(0, result.offset_bits, NUM);
+}
+
 void test_convert_32_bit_numbering(){
     u32 result = convert_32_bit_numbering(0x0);
     TEST_ASSERT_EQUAL_u64(0x0, result, HEX);
@@ -196,11 +219,11 @@ void test_create_n_bit_mask(){
 
 void test_extract_data_valid(){
     u8 data[] = {0xFF, 0xAB};
-    u32 data_length = 2 * BYTE_SIZE;
-    DataOffset test_offset = {};
+    u32 num_ele = sizeof(data);
+    u32 data_length = num_ele * BYTE_SIZE;
+
+    DataOffset test_offset = create_data_offset(data, num_ele);
     DataOffset *data_offset = &test_offset;
-    data_offset->data = data;
-    data_offset->length = data_length;
 
     // Extract no bits
     Optional_u64 result = extract_bits(data_offset, 0);
@@ -249,10 +272,9 @@ void test_extract_data_valid(){
 
 void test_extract_data_invalid_num_bits(){
     u8 data[] = {0xFF, 0xAB};
-    DataOffset test_offset = {};
+    u32 num_ele = sizeof(data);
+    DataOffset test_offset = create_data_offset(data, num_ele);
     DataOffset *data_offset = &test_offset;
-    data_offset->data = data;
-    data_offset->length = 2 * BYTE_SIZE;
 
     // Extract out of bounds
     u32 num_bits = 65;
@@ -265,10 +287,9 @@ void test_extract_data_invalid_num_bits(){
 
 void test_extract_data_invalid_data(){
     u8 data[] = {0xFF};
-    DataOffset test_offset = {};
+    u32 num_ele = sizeof(data);
+    DataOffset test_offset = create_data_offset(data, num_ele);
     DataOffset *data_offset = &test_offset;
-    data_offset->data = data;
-    data_offset->length = 1 * BYTE_SIZE;
 
     // Extract out of bounds
     u32 num_bits = 32;
@@ -281,10 +302,9 @@ void test_extract_data_invalid_data(){
 
 void test_extract_data_invalid_offset(){
     u8 data[] = {0xFF};
-    DataOffset test_offset = {};
+    u32 num_ele = sizeof(data);
+    DataOffset test_offset = create_data_offset(data, num_ele);
     DataOffset *data_offset = &test_offset;
-    data_offset->data = data;
-    data_offset->length = 1 * BYTE_SIZE;
     data_offset->error.value |= 1;
 
     // Extract out of bounds
@@ -305,6 +325,7 @@ void test_extract_bits(){
 
 
 void test_bit_util(){
+    test_create_data_offset();
     test_convert_32_bit_numbering();
     test_convert_64_bit_numbering();
     test_create_n_bit_mask();
