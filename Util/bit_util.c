@@ -279,10 +279,28 @@ void test_extract_data_invalid_data(){
 }
 
 
+void test_extract_data_invalid_offset(){
+    u8 data[] = {0xFF};
+    DataOffset test_offset = {};
+    DataOffset *data_offset = &test_offset;
+    data_offset->data = data;
+    data_offset->length = 1 * BYTE_SIZE;
+    data_offset->error.value |= 1;
+
+    // Extract out of bounds
+    u32 num_bits = 8;
+    Optional_u64 result = extract_bits(data_offset, num_bits);
+    TEST_ASSERT_EQUAL_u64(1, result.error.value & True, HEX);
+    TEST_ASSERT_EQUAL_u64(0, result.value, HEX);
+    TEST_ASSERT_EQUAL_u64(0, data_offset->offset_bits, HEX);
+}
+
+
 void test_extract_bits(){
     test_extract_data_valid();
     test_extract_data_invalid_num_bits();
     test_extract_data_invalid_data();
+    test_extract_data_invalid_offset();
 }
 
 
