@@ -8,8 +8,11 @@
 !*.c
 !*.h
 
-!2-Ethernet/
 !Util/
 
+
+!2-Ethernet/
 !3-GeoNetworking/
+!7-IntelligentTransportSystem/
+
 
