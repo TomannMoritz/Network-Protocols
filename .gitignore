@@ -4,10 +4,12 @@
 # exclude
 !.gitignore
 
+!*.md
 !*.c
 !*.h
 
 !2-Ethernet/
 !Util/
 
+!3-GeoNetworking/
 
