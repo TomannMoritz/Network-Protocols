@@ -44,7 +44,7 @@ typedef struct {
 #define COMMON_TRAFFIC_CLASS_BITS (8)
 #define COMMON_PAYLOAD_LENGTH_BITS (16)
 #define COMMON_MHL_BITS (8)
-#define COMMON_RESERVED_BITS_2 (4)
+#define COMMON_RESERVED_BITS_2 (8)
 typedef struct {
     u32 next_header: COMMON_NEXT_HEADER_BITS;
     u32 header_type: COMMON_HEADER_TYPE_BITS;
@@ -86,4 +86,9 @@ typedef struct {
     u32 heading: LPV_HEADING_BITS;
 } LongPositionVector;
 
+
+//--------------------------------------------------
+// Testing
+//--------------------------------------------------
+void test_geonetworking();
 
