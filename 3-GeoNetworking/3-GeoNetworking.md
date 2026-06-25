@@ -37,8 +37,8 @@
 
 | Name              | Type          | Length    | Info |
 |:------------------|:--------------|:----------|:-----|
-| `basic_header`    | unsigned int  | -         |
-| `common_header`   | unsigned int  | -         |
+| `basic_header`    | BasicHeader   | -         |
+| `common_header`   | CommonHeader  | -         |
 | `sn`              | unsigned int  | 16-bit    | Sequence Number
 | `_`               | -             | 8-bit     | *RESERVED*
 | `lpv`             | LPV           | -         |
@@ -49,8 +49,8 @@
 
 | Name              | Type          | Length    | Info |
 |:------------------|:--------------|:----------|:-----|
-| `basic_header`    | unsigned int  | -         |
-| `common_header`   | unsigned int  | -         |
+| `basic_header`    | BasicHeader   | -         |
+| `common_header`   | CommonHeader  | -         |
 | `sn`              | unsigned int  | 16-bit    | Sequence Number
 | `_`               | -             | 8-bit     | *RESERVED*
 | `lpv`             | LPV           | -         |
@@ -70,7 +70,7 @@
 |:--------------|:--------------|:----------|:-----|
 | `version`     | unsigned int  | 4-bit     |
 | `next_header` | unsigned int  | 4-bit     |
-| `_`           | -             | 8-bit     |
+| `_`           | -             | 8-bit     | *RESERVED*
 | `life_time`   | LifeTime      | -         |
 | `rhl`         | unsigned int  | 8-bit     | Remaining Hop Limit
 
@@ -133,4 +133,4 @@
 | `manual`      | unsigned int  | 1-bit     | Manually configured network address
 | `st`          | unsigned int  | 5-bit     | Station Type
 | `_`           | -             | 10-bit    | *RESERVED*
-| `mid`         | unsigned int  | 48-bit    | *RESERVED*
+| `mid`         | unsigned int  | 48-bit    | MAC ID

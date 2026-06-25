@@ -1,6 +1,7 @@
 # 7-Intelligent Transport System (ITS)
 
 > Reference: Cooperative Awareness Message (CAM) - [ETSI EN 302 637-2 V1.4.1 (2019-04)](https://www.etsi.org/deliver/etsi_en/302600_302699/30263702/01.04.01_60/en_30263702v010401p.pdf)
+> <br>
 > Reference: Common Data Dictionary - [ETSI TS 102 894-2 V1.3.1 (2018-08)](https://www.etsi.org/deliver/etsi_ts/102800_102899/10289402/01.03.01_60/ts_10289402v010301p.pdf)
 
 ## ToC
