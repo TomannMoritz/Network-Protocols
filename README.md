@@ -2,6 +2,8 @@
 Network Protocols
 
 ## Compilation
+### Ethernet
 ```bash
-gcc -o main main.c
+gcc -o main *.c ../Util/*.c
 ```
+

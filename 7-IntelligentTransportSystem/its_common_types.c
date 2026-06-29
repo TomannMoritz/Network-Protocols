@@ -1,7 +1,4 @@
 #include "its_common_types.h"
-#include <stdio.h>
-
-#include "../Util/bit_util.c"
 
 
 //--------------------------------------------------
@@ -28,13 +25,7 @@ void parse_curvature_confidence(CurvatureConfidence *confidence, DataOffset *dat
 }
 
 void parse_curvature_value(CurvatureValue *value, DataOffset *data_offset){
-    log_bits(stdout, data_offset->data, 8);
-    data_offset->offset_bits = 9;
-    printf("OFFSET: %d\n", data_offset->offset_bits);
-
-    signed long int extracted_value = (signed long int)extract_bits(data_offset, CURVATURE_VALUE_BITS).value;
-    data_offset->offset_bits += 1;
-    value->value = extracted_value;
+    value->value = (signed long int)extract_bits(data_offset, CURVATURE_VALUE_BITS).value + CURVATURE_VALUE_OFFSET;
 }
 
 void parse_drive_direction(DriveDirection *drive_direction, DataOffset *data_offset){
@@ -125,6 +116,8 @@ void parse_altitude(Altitude *altitude, DataOffset *data_offset){
 
 void parse_curvature(Curvature *curvature, DataOffset *data_offset){
     parse_curvature_value(&curvature->curvature_value, data_offset);
+
+    data_offset->offset_bits += 1;
     parse_curvature_confidence(&curvature->curvature_confidence, data_offset);
 }
 
@@ -134,11 +127,8 @@ void parse_heading(Heading *heading, DataOffset *data_offset){
 }
 
 void parse_its_pdu_header(ItsPduHeader *its_pdu_header, DataOffset *data_offset){
-    its_pdu_header->protcol_version = data_offset->data[0];
-    its_pdu_header->message_id = data_offset->data[1];
-
-    data_offset->offset_bits += ITS_PROTOCOL_VERSION_BITS;
-    data_offset->offset_bits += ITS_MESSAGE_ID_BITS;
+    its_pdu_header->protcol_version = extract_bits(data_offset, ITS_PROTOCOL_VERSION_BITS).value;
+    its_pdu_header->message_id = extract_bits(data_offset, ITS_MESSAGE_ID_BITS).value;
 
     parse_station_id(&its_pdu_header->station_id, data_offset);
 }
@@ -155,11 +145,9 @@ void parse_pos_confidence_ellipse(PosConfidenceEllipse *pos_confidence_ellipse, 
 }
 
 void parse_reference_position(ReferencePosition *reference_position, DataOffset *data_offset){
-    // reserved: 4 bits
-    data_offset->offset_bits += 4;
     parse_latitude(&reference_position->latitude, data_offset);
 
-    data_offset->offset_bits += 1;
+    data_offset->offset_bits += REFERENCE_POSITION_RESERVED_BITS;
     parse_longitude(&reference_position->longitude, data_offset);
     parse_pos_confidence_ellipse(&reference_position->position_confidence_ellipse, data_offset);
     parse_altitude(&reference_position->altitiude, data_offset);
@@ -176,14 +164,7 @@ void parse_vehicle_length(VehicleLength *vehicle_length, DataOffset *data_offset
 }
 
 void parse_yaw_rate(YawRate *yaw_rate, DataOffset *data_offset){
-    data_offset->offset_bits = 32 + 6;
-    log_bits(stdout, data_offset->data, 8);
-    printf("OFFSET: %d\n", data_offset->offset_bits);
     parse_yaw_rate_value(&yaw_rate->yaw_rate_value, data_offset);
-
-    log_bits(stdout, data_offset->data, 8);
-    printf("OFFSET: %d\n", data_offset->offset_bits);
-
     parse_yaw_rate_confidence(&yaw_rate->yaw_rate_confidence, data_offset);
 }
 

@@ -165,6 +165,7 @@ typedef struct {
 } Altitude;
 
 
+#define CURVATURE_RESERVED_BITS (1)
 typedef struct {
     CurvatureValue curvature_value;
     CurvatureConfidence curvature_confidence;
@@ -199,6 +200,7 @@ typedef struct {
 } PosConfidenceEllipse;
 
 
+#define REFERENCE_POSITION_RESERVED_BITS (1)
 typedef struct {
     Latitude latitude;
     Longitude longitude;
@@ -238,6 +240,8 @@ void parse_curvature(Curvature *curvature, DataOffset *data_offset);
 void parse_curvature_calculation_mode(CurvatureCalculationMode *mode, DataOffset *data_offset);
 void parse_yaw_rate(YawRate *yaw_rate, DataOffset *data_offset);
 
+void parse_station_type(StationType *type, DataOffset *data_offset);
+void parse_reference_position(ReferencePosition *reference_position, DataOffset *data_offset);
 
 //--------------------------------------------------
 // Testing

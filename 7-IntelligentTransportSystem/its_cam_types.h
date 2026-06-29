@@ -4,7 +4,6 @@
 #pragma once
 #include "../Util/bit_util.h"
 #include "its_common_types.h"
-#include "its_common_types.c"
 
 
 #define GENERATION_DELTA_TIME_BITS BYTE_SIZE * 2
@@ -56,6 +55,7 @@ typedef struct {
 
 //--------------------------------------------------
 void parse_cam_parameters(CamParameters *cam_parameters, DataOffset *data_offset);
+void parse_generation_delta_time(GenerationDeltaTime *generation_delta_time, DataOffset *data_offset);
 
 //--------------------------------------------------
 void parse_basic_container(BasicContainer *basic_container, DataOffset *data_offset);

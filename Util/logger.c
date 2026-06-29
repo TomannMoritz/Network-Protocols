@@ -1,7 +1,6 @@
 // Logger
 #include "logger.h"
 
-#include "bit_util.c"
 
 #define HEX_FORMAT "%02X"
 #define HEX_SPACE " "

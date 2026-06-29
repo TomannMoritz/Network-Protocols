@@ -88,6 +88,11 @@ typedef struct {
 
 
 //--------------------------------------------------
+void parse_basic_header(BasicHeader *basic_header, DataOffset *data_offset);
+void parse_common_header(CommonHeader *common_header, DataOffset *data_offset);
+
+
+//--------------------------------------------------
 // Testing
 //--------------------------------------------------
 void test_geonetworking();

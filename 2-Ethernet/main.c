@@ -1,6 +1,4 @@
-#include "2-Ethernet/ethernet.h"
-#include "2-Ethernet/ethernet.c"
-
+#include "ethernet.h"
 
 int main(void){
     int socket_fd = setup();

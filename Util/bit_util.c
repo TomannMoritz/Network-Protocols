@@ -1,8 +1,6 @@
 // bit util
 #include "bit_util.h"
 
-#include "test_util.c"
-
 
 #define MIN(value_1, value_2) (value_1 < value_2 ? value_1 : value_2)
 

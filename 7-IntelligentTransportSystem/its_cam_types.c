@@ -17,8 +17,6 @@ void parse_basic_container(BasicContainer *basic_container, DataOffset *data_off
 
 void parse_hf_container(HFContainer *hf_container, DataOffset *data_offset){
     // TODO: CHOICE
-    // reserved
-    data_offset->offset_bits += 9;
 
     parse_basic_vehicle_container_hf(&hf_container->basic_container_hf, data_offset);
     // parse_rsu_container_high_frequency(&high_frequency_container->rsuContainerHighFrequency, data_offset);
@@ -34,9 +32,6 @@ void parse_basic_vehicle_container_hf(BasicVehicleContainerHF *basic_container_h
     parse_longitudinal_acceleration(&basic_container_hf->longitudinal_acceleration, data_offset);
     parse_curvature(&basic_container_hf->curvature, data_offset);
     parse_curvature_calculation_mode(&basic_container_hf->curvature_calculation_mode, data_offset);
-
-    data_offset->offset_bits += 7;
-    printf("\n\n\n");
     parse_yaw_rate(&basic_container_hf->yaw_rate, data_offset);
 }
 
