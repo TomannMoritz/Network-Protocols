@@ -29,3 +29,14 @@ void parse_logical_link_control(LogicalLinkControl *llc, DataOffset *data_offset
     llc->organization_code = extract_bits(data_offset, LLC_ORGANIZATION_CODE_BITS).value;
     llc->type = extract_bits(data_offset, LLC_TYPE_BITS).value;
 }
+
+
+//--------------------------------------------------
+// Testing
+//--------------------------------------------------
+
+//--------------------------------------------------
+void test_logical_link_control(){
+    // TODO:
+    TEST_ASSERT_EQUAL_u64(0, 2, NUM);
+}

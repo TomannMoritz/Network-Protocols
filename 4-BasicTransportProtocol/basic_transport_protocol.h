@@ -37,3 +37,8 @@ typedef struct {
 void parse_btp_a(BTP_A *btp_a, DataOffset *data_offset);
 void parse_btp_b(BTP_B *btp_b, DataOffset *data_offset);
 
+
+//--------------------------------------------------
+// Testing
+//--------------------------------------------------
+void test_basic_transport_protocol();

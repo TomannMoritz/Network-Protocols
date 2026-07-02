@@ -41,3 +41,8 @@ typedef struct {
 //--------------------------------------------------
 void parse_logical_link_control(LogicalLinkControl *llc, DataOffset *data_offset);
 
+
+//--------------------------------------------------
+// Testing
+//--------------------------------------------------
+void test_logical_link_control();

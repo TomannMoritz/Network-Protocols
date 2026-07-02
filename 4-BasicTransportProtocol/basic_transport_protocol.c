@@ -14,3 +14,13 @@ void parse_btp_b(BTP_B *btp_b, DataOffset *data_offset){
     btp_b->destination_port_info = extract_bits(data_offset, BTP_B_DESTINATION_PORT_INFO_BITS).value;
 }
 
+
+//--------------------------------------------------
+// Testing
+//--------------------------------------------------
+
+//--------------------------------------------------
+void test_basic_transport_protocol(){
+    // TODO:
+    TEST_ASSERT_EQUAL_u64(0, 4, NUM);
+}

@@ -71,3 +71,8 @@ typedef struct {
 
 void parse_ieee_802_11(IEEE_802_11 *ieee, DataOffset *data_offset);
 
+
+//--------------------------------------------------
+// Testing
+//--------------------------------------------------
+void test_ieee_802_dot_11();

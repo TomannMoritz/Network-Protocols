@@ -63,3 +63,15 @@ void parse_ieee_1609_dot_2_post_signed(Ieee1609Dot2SignedContent *signed_content
     parse_ieee_1609_signature(&signed_content->signed_data.signature, data_offset);
 }
 
+
+//--------------------------------------------------
+// Testing
+//--------------------------------------------------
+
+//--------------------------------------------------
+void test_ieee_1609_dot_2(){
+    // TODO:
+    TEST_ASSERT_EQUAL_u64(0, 1, NUM);
+}
+
+

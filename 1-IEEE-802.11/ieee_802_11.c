@@ -48,3 +48,13 @@ void parse_ieee_802_11(IEEE_802_11 *ieee, DataOffset *data_offset){
     parse_ieee_802_11_qos_control(&ieee->qos_control, data_offset);
 }
 
+
+//--------------------------------------------------
+// Testing
+//--------------------------------------------------
+
+//--------------------------------------------------
+void test_ieee_802_dot_11(){
+    // TODO:
+    TEST_ASSERT_EQUAL_u64(0, 1, NUM);
+}

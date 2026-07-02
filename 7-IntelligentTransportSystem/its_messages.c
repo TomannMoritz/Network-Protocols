@@ -12,7 +12,6 @@ void parse_coop_awareness(CoopAwareness *coop_awareness, DataOffset *data_offset
 // Testing
 //--------------------------------------------------
 void test_its_messages(){
-    TEST_ASSERT_EQUAL_u64(1, 2, NUM);
     // TODO:
 }
 

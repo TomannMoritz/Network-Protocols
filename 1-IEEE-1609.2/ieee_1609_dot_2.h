@@ -62,3 +62,8 @@ void parse_ieee_1609_dot_2_pre_signed_unsecure(Ieee1609Dot2Data *signed_data, Ie
 void parse_ieee_1609_dot_2_post_signed(Ieee1609Dot2SignedContent *signed_content, DataOffset *data_offset);
 
 
+//--------------------------------------------------
+// Testing
+//--------------------------------------------------
+void test_ieee_1609_dot_2();
+
