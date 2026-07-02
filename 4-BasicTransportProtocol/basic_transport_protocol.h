@@ -39,6 +39,13 @@ void parse_btp_b(BTP_B *btp_b, DataOffset *data_offset);
 
 
 //--------------------------------------------------
+// Logging
+//--------------------------------------------------
+void log_btp_a(FILE *log_fd, BTP_A *btp_a, LogFormat log_format);
+void log_btp_b(FILE *log_fd, BTP_B *btp_b, LogFormat log_format);
+
+
+//--------------------------------------------------
 // Testing
 //--------------------------------------------------
 void test_basic_transport_protocol();

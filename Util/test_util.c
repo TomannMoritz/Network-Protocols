@@ -3,7 +3,7 @@
 
 
 #define EXPECTED_STR "\n\tExpected: \t"
-#define RESULT_STR   "\n\tResult:   \t"
+#define RESULT_STR   "\tResult:   \t"
 
 #define TEST_INFO "%s(%s:%d) "
 const u8 *TEST_PASS = "[~] PASS ";
@@ -48,7 +48,35 @@ void log_u64_binary(FILE *log_fd, u64 *value){
 }
 
 
-void assert_equal_u64(u64 expected, u64 result, TestLogFormat test_log_format, u8 *file_name, u32 line_num){
+
+//--------------------------------------------------
+void log_value(FILE *log_fd, u64 value, LogFormat log_format){
+    switch (log_format){
+        case ASCII:
+            fprintf(log_fd, "'");
+            log_u64_ascii(log_fd, &value);
+            fprintf(log_fd, "'");
+            break;
+
+        case BINARY:
+            log_u64_binary(log_fd, &value);
+            break;
+
+        case HEX:
+            fprintf(log_fd, "0x%lX", value);
+            break;
+
+        case NUM:
+        default:
+            fprintf(log_fd, "%lu", value);
+            break;
+    }
+
+    fprintf(log_fd, "\n");
+}
+
+
+void assert_equal_u64(u64 expected, u64 result, LogFormat log_format, u8 *file_name, u32 line_num){
     if (expected == result){
         tests_passed++;
 
@@ -66,33 +94,10 @@ void assert_equal_u64(u64 expected, u64 result, TestLogFormat test_log_format, u
     u64 *expected_p = &expected;
     u64 *result_p = &result;
 
-    switch (test_log_format){
-        case ASCII:
-            fprintf(stdout, "'");
-            log_u64_ascii(stdout, expected_p);
-            fprintf(stdout, "'%s'", RESULT_STR);
-            log_u64_ascii(stdout, result_p);
-            fprintf(stdout, "'");
-            break;
-        case BINARY:
-            log_u64_binary(stdout, expected_p);
-            fprintf(stdout, RESULT_STR);
-            log_u64_binary(stdout, result_p);
-            break;
 
-        case HEX:
-            fprintf(stdout, "0x%lX", expected);
-            fprintf(stdout, "%s", RESULT_STR);
-            fprintf(stdout, "0x%lX", result);
-            break;
-
-        case NUM:
-        default:
-            fprintf(stdout, "%lu", expected);
-            fprintf(stdout, "%s", RESULT_STR);
-            fprintf(stdout, "%lu", result);
-            break;
-    }
+    log_value(stdout, *expected_p, log_format);
+    fprintf(stdout, RESULT_STR);
+    log_value(stdout, *result_p, log_format);
     fprintf(stdout, "\n");
 }
 
